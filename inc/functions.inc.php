@@ -1,288 +1,213 @@
-<!-- Fichier qui contient les fonctions php à utiliser dans notre site -->
+<!-- Fichier qui contient les fonctions php à utliser dans notre site  -->
+
 <?php
+
+use FTP\Connection;
 
 session_start();
 
-define("RACINE_SITE", "/PHP/Course/PHP-2/cinema_php/"); // constante qui définit les dossiers dans lesquels se situe le site pour pouvoir déterminer des chemin absolus à partir de localhost (on ne prend pas locahost). Ainsi nous écrivons tous les chemins (exp : src, href) en absolus avec cette constante.
 
 
-///////////////////////////// Fonction de débugage //////////////////////////
 
-            function debug($var) {
-                
-                echo '<pre class="border border-dark bg-light text-primary w-50 p-3">';
+///////////////////// Fonction de debugage///////////////////////////
+function debug($var)
+{
 
-                    var_dump($var);
+    echo '<pre class="border border-dark bg-light text-primary w-50 p-3">';
 
-                echo '</pre>';
+    var_dump($var);
 
-            }
+    echo '</pre>';
+}
 
-
-////////////////////// Fonction d'alert ////////////////////////////////////////
-
-function alert(string $contenu, string $class) {
-
-    return "<div class='alert alert-$class alert-dismissible fade show text-center w-50 m-auto mb-5' role='alert'>
-        $contenu
-
-            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-
-        </div>";
-
+////////    Function Alert ///////////////////:
+function alert(string $contenu, string $class){
+    return "<div class= 'alert alert-$class alert-dismissible fade show text-center w-50 m-auto mb-5' role='alert'> $contenu
+    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+    </div>";
 
 }
 
-
-///////////////////////////  Fonction de connexion à la BDD //////////////////////////
-
-            /**
-             * On va utiliser l'extension PHP Data Object (PDO), elle définit une excellente interface pour accèder à une base de données depuis PHP et d'éxécuter des requêtes SQL.
-             * pour se connecter à la BDD avec PDO, il faut créer une instance de cette Class/Objet (PDO) qui représente une connexion à la BDD.
-             */
-
-             // On déclare des constantes d'environnement qui vont contenir les informations à la connexion à la BDD
-
-                // Constante du serveur => localhost
-                define("DBHOST", "localhost");
-
-                // Constante de l'utilisateur de la BDD du serveur en local  => root
-                define("DBUSER", "root");
-
-                // Constante pour le mot de passe de serveur en local => pas de mot de passe
-                define("DBPASS", "");
-
-                // Constante pour le nom de la BDD
-                define("DBNAME", "cinema");
+///////////////////// Fonctions de connexion à la BDD //////////////////////
 
 
-    function connexionBdd() {
+/**
+ * On va utliser l'xtension PHP Data Object (PDO),elle définit une excellente interface pour accéder à une
+ * de données depuis PHP et d'éxécuter des requêtes SQL
+ * Pour se connecter à la base de données avec PDO il faut créer une instance de cette classe/Objet (PDO) qui
+ * représente une connexion à la BDD.
+ */
 
-        // Sans la variable $dsn et sans le constantes, on se connecte à la BDD :
 
-            $pdo = new PDO('mysql:host=localhost;dbname=cinema;charset=utf8', 'root', '');
+// On déclare des constantes d'environnement qui vont contenir les informations à la connexion à la BDD
+define('DBHOST', 'Localhost');
 
-        // avec la variable DSN (Data Source Name) et les constantes
+//Constante de l'utlisateur à la BDD du serveur en local =>
+define('DBUSER', 'root');
 
-            // $dsn = "mysql:host=localhost;dbname=cinema;charset=utf8";
+//Constante pour le mot de passe de serveur en local => pas de mot de passe
+define('DBPASS', '');
 
-            $dsn = "mysql:host=" .DBHOST.";dbname=".DBNAME.";charset=utf8";
+// Constante pour le nom de la BDD
+define('DBNAME', 'cinema');
 
-            try {
-                
-                $pdo = new PDO($dsn, DBUSER, DBPASS);
 
-                // On définit le mode d'erreur de PDO sur Exception
-                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        
-            }
-            catch(PDOException $e) {
+function connexionBdd()
+{
+    //Sans la variable $dsn et sans les constantes, on se connecte à la BDD;
+    // $pdo= new PDO(' mysql:host=localhost;dbname=cinema;charset=utf8'','root','');
 
-            die($e->getMessage());
+    // avec la variable  DSN ( Data Source Name ) et les constantes 
 
-            }
+    // $dsn='mysql:host=localhost;dbname=cinema;charset=utf8';
 
-            return $pdo;
+    $dsn = "mysql:host=" . DBHOST . ";dbname=" . DBNAME . ";charset=utf8";
 
-            
+    try {
+        $pdo = new PDO($dsn, DBUSER, DBPASS);
+
+
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        die($e->getMessage());
     }
-    connexionBdd();
+    return $pdo;
+}
+// ConnexionBDD();
 
+////////////////Une fonction pour créer la table users/////////////////
 
-    ///////////////// Une fonction pour créer la table users ////////////////////
-    function createTableUsers() {
-
-        $pdo = connexionBdd();
-
-        $sql = "CREATE TABLE IF NOT EXISTS users (
-            id_user INT PRIMARY KEY AUTO_INCREMENT,
-            firstName VARCHAR(50) NOT NULL,
-            lastName VARCHAR(50) NOT NULL,
-            pseudo VARCHAR(50) NOT NULL,
-            email VARCHAR(100) NOT NULL,
-            mdp VARCHAR(255) NOT NULL,
-            phone VARCHAR(30) NOT NULL,
-            civility ENUM('f', 'h') NOT NULL,
-            birthday DATE NOT NULL,
-            address VARCHAR(50) NOT NULL,
-            zipCode VARCHAR(50) NOT NULL,
-            city VARCHAR(50) NOT NULL,
-            country VARCHAR(50) NOT NULL,
-            role ENUM('ROLE_USER', 'ROLE_ADMIN') DEFAULT 'ROLE_USER'
-        )";
-
-        $request = $pdo->exec($sql);
-
-    }
-
-    // createTableUsers();
-
-    //////////////////// Fonctions du CRUD pour les utilisateurs Users /////////////////////
-
-    function inscriptionUsers(string $firstName, string $lastName, string $pseudo, string $email, string $mdp, string $phone, string $civility, string $birthday, string $address, string $zipCode, string $city, string $country) 
-    : void {
-
-        $pdo = connexionBdd(); // je stock ma connexion  à la BDD dans une variable
-
-        $sql = "INSERT INTO users 
-        (firstName, lastName, pseudo, email, mdp, phone, civility, birthday, address, zipCode, city, country)
-        VALUES
-        (:firstName, :lastName, :pseudo, :email, :mdp, :phone, :civility, :birthday, :address, :zipCode, :city, :country)"; // Requête d'insertion que je stock dans une variable
-        $request = $pdo->prepare($sql); // Je prépare ma requête et je l'exécute
-        $request->execute( 
-            array(
-            ':firstName' => $firstName,
-            ':lastName' => $lastName,
-            ':pseudo' => $pseudo,
-            ':email' => $email,
-            ':mdp' => $mdp,
-            ':phone' => $phone,
-            ':civility' => $civility,
-            ':birthday' => $birthday,
-            ':address' => $address,
-            ':zipCode' => $zipCode,
-            ':city' => $city,
-            ':country' => $country
-
-        ));
-
-
-    }
-
-
-    ////////////////// Fonction pour vérifier si un email existe dans la BDD ///////////////////////////////
-
-    function checkEmailUser(string $email) :mixed {
-        $pdo = connexionBdd();
-        $sql = "SELECT * FROM users WHERE email = :email";
-        $request = $pdo->prepare($sql);
-        $request->execute( array(
-            ':email' => $email
-
-        ));
-
-        $resultat = $request->fetch();
-        return $resultat;
-    }
-
-    ////////////////// Fonction pour vérifier si un pseudo existe dans la BDD ///////////////////////////////
-
-    function checkPseudoUser(string $pseudo) {
-        $pdo = connexionBdd();
-        $sql = "SELECT * FROM users WHERE pseudo = :pseudo";
-        $request = $pdo->prepare($sql);
-        $request->execute( array(
-            ':pseudo' => $pseudo
-
-        ));
-
-        $resultat = $request->fetch();
-        return $resultat;
-
-    }
-
-
-    
-//////////////////Fonction pour vérifier un utilisateur////////////////////
-    
-function checkUser(string $email, string $pseudo) :mixed {
-        
+function createTableUsers()
+{
     $pdo = connexionBdd();
-    $sql = 'SELECT * FROM users WHERE pseudo = :pseudo AND email = :email';
+    $sql = "CREATE TABLE IF NOT EXISTS users(
+    id_user INT PRIMARY KEY AUTO_INCREMENT,
+    firstname VARCHAR(50) NOT NULL,
+    lastname VARCHAR(50) NOT NULL,
+    pseudo VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    mdp VARCHAR(255) NOT NULL,
+    phone VARCHAR(50) NOT NULL,
+    civility ENUM('f', 'h') NOT NULL,
+    birthday DATE NOT NULL,
+    address VARCHAR(50) NOT NULL,
+    zipCode VARCHAR(50) NOT NULL,
+    city VARCHAR(50) NOT NULL,
+    country VARCHAR(50) NOT NULL,
+    role ENUM('ROLE_USER','ROLE_ADMIN') DEFAULT 'ROLE_USER'
+
+   )";
+    $_REQUEST = $pdo->exec($sql);
+}
+// createTableUsers();
+
+//////////////  Functions du CRUD pour les Utilisateurs Users  ////////////////:
+
+function inscriptionUsers(string $firstname, string $lastname, string $pseudo, string $mdp, string $email, string $phone, string $civility, string $birthday, string $address, string $zipCode, string $city, string $country): void /*:void indicate that this function does not return*/
+{
+    $pdo = connexionBdd();
+
+    $sql = "INSERT INTO users (firstname, lastname, pseudo, email, mdp, phone, civility, birthday, address, zipCode, city, country) 
+            VALUES(:firstname, :lastname, :pseudo, :email, :mdp, :phone, :civility, :birthday, :address, :zipCode, :city, :country)";
+
     $request = $pdo->prepare($sql);
-    $request->execute( array( 
-    ':pseudo' => $pseudo,
-    ':email'=> $email,
-    ) );
-    $resultat = $request->fetch();
-    return $resultat;
-  }
-
-
-  ///////////////////////   Log out function  ////////////////////////////
-
-
-  function logOut(){
-
-    if(isset($_GET['action']) && !empty($_GET['action']) && $_GET['action'] == 'deconnexion' ){
-
-
-        unset($_SESSION['user']); // On supprime l'indice "user " de la session pour se déconnecter // cette fonction détruit les variables  stocké  comme 'firstName' et 'email'.
-
-        //session_destroy(); // Détruit toutes les données de la session déjà  établie . cette fonction détruit la session sur le serveur 
-
-        header("location:". RACINE_SITE ."index.php");
-    }
-
+    $request->execute(array(
+        ':firstname' => $firstname,
+        ':lastname' => $lastname,
+        ':pseudo' => $pseudo,
+        ':email' => $email,
+        ':mdp' => $mdp,
+        ':phone' => $phone,
+        ':civility' => $civility,
+        ':birthday' => $birthday,
+        ':address' => $address,
+        ':zipCode' => $zipCode,
+        ':city' => $city,
+        ':country' => $country
+    ));
 }
 
-    ///////////////// Une fonction pour créer la table films ////////////////////
 
-    function createTableFilms() {
+////////// Function pour vérifier si un email exist dans la BDD  ////////////////
 
-        $pdo = connexionBdd();
+function checkEmailUSer(string $email) :mixed{
+    $pdo = connexionBdd();
+    $sql = "SELECT * FROM users WHERE email = :email";
 
-        $sql = "CREATE TABLE IF NOT EXISTS films (
-            id_film INT PRIMARY KEY AUTO_INCREMENT,
-            category_id INT NOT NULL,
-            title VARCHAR(100) NOT NULL,
-            director VARCHAR(100) NOT NULL,
-            actors VARCHAR(100) NOT NULL,
-            ageLimit VARCHAR(5) NULL,
-            duration TIME NOT NULL,
-            synopsis TEXT NOT NULL,
-            date DATE NOT NULL,
-            image VARCHAR(255) NOT NULL,
-            price FLOAT NOT NULL,
-            stock INT NOT NULL
+    $request = $pdo->prepare($sql);
+    $request->execute(array(
+        ':email' => $email
+    ));
 
-        )";
+    $resultat = $request->fetch();
+}
+////////// Function pour vérifier si un pseudo exist dans la BDD  ////////////////
+function checkPseudoUSer(string $pseudo) :mixed{
+    $pdo = connexionBdd();
+    $sql = "SELECT * FROM users WHERE pseudo = :pseudo";
 
-        $request = $pdo->exec($sql);
+    $request = $pdo->prepare($sql);
+    $request->execute(array(
+        ':pseudo' => $pseudo
+    ));
 
-    }
+    $resultat = $request->fetch();
+}
 
-    // createTableFilms();
+///////////// Une fonction pour créer la table films//////////////////
+function createTableFilms()
+{
+    $pdo = connexionBdd();
+    $sql = "CREATE TABLE IF NOT EXISTS films(
+        id_film INT PRIMARY KEY AUTO_INCREMENT,
+        category_id INT NOT NULL,
+        title VARCHAR(100) NOT NULL,
+        directors VARCHAR(100) NOT NULL,
+        actors VARCHAR(100) NOT NULL,
+        ageLimit VARCHAR(5)  NULL,
+        duration Time NOT NULL,
+        synopsis Text NOT NULL,
+        date  DATE  NOT NULL,
+        image VARCHAR(255) NOT NULL,
+        price FLOAT NOT NULL,
+        stock INT NOT NULL
+        
+    )";
+    $_REQUEST = $pdo->exec($sql);
+}
+// createTableFilms();
 
-    ///////////////// Une fonction pour créer la table categories ////////////////////
 
-    function createTableCategories() {
 
-        $pdo = connexionBdd();
+////:  une function pour créer la table categorie ://////////////////////
 
-        $sql = "CREATE TABLE IF NOT EXISTS categories (
-            id_category INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-            name VARCHAR(50) NOT NULL,
-            description TEXT NULL
-        )";
+function createTableCategories()
+{
+    $pdo = connexionBdd();
+    $sql = "CREATE TABLE IF NOT EXISTS categories (
+    id_category INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL,
+    description TEXT NULL
+    )";
+    $request = $pdo->exec($sql);
+}
+// createTableCategories();
 
-        $request = $pdo->exec($sql);
 
-    }
 
-    // createTableCategories();
 
-    ////////////////////// Une fonction pour la création des clés étrangères //////////////////////////
+/////////////////////: Une fonctions pour la création des clés étrangers :://///////////::::
 
-        // $tableF : table où on va créer la clé étrangère
-        // $tableP : table à partir de laquelle on récupère la clé primaire
-        // $foreign : le nom de la clé étrangère
-        // $primary : le nom de la clé primaire
+function foreignKey(string $tableF, string $foreign, string $tableP, string $primary)
+{
+    $pdo = connexionBdd();
+    $sql = "ALTER TABLE $tableF ADD CONSTRAINT FOREIGN KEY ($foreign) REFERENCES $tableP($primary)";
+    $request = $pdo->exec($sql);
+}
 
-    function foreignKey(string $tableF, string $foreign, string $tableP, string $primary) {
-
-        $pdo = connexionBdd();
-
-        $sql = "ALTER TABLE $tableF ADD CONSTRAINT FOREIGN KEY ($foreign) REFERENCES $tableP ($primary)";
-
-        $request = $pdo->exec($sql);
-
-    }
-
-    // Création de la clé étrangère dans la table films
-    // foreignKey('films', 'category_id', 'categories', 'id_category');
-
+//// Création de la clé étranger dans la tabke films
+// foreignKey('films', 'category_id', 'categories', 'id_category');
 
 
 
