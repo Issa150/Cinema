@@ -66,6 +66,12 @@ h2 {
   font-weight: bolder !important;
 }
 
+.sidebarre {
+  background-color: #353535;
+  color: #fff !important;
+  box-shadow: var(--box-shadow-light) !important;
+}
+
 /* a.btn,
 input.btnpanier {
   background-color: var(--red) !important;
@@ -74,20 +80,3 @@ input.btnpanier {
   font-size: 1.3rem !important;
   font-weight: bold;
 } */
-.sidebarre{
-  background-color: #35353535;
-  color: white !important;
-  /* box-shadow: var(--box-shadow-light) !important; */
-}
-
-.imggg{
-  width: 400px !important;
-  height: 600px;
-  object-fit: cover;
-}
-.Welcome-img{
-  width: max-content;
-  font-size: 10em;
-  display: block;
-  margin: auto;
-}

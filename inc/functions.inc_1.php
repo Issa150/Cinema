@@ -3,7 +3,7 @@
 
 session_start();
 
-define("RACINE_SITE", "/PHP/Course/PHP-2/cinema_php/"); // constante qui définit les dossiers dans lesquels se situe le site pour pouvoir déterminer des chemin absolus à partir de localhost (on ne prend pas locahost). Ainsi nous écrivons tous les chemins (exp : src, href) en absolus avec cette constante.
+define("RACINE_SITE", "/YACINE/cinema_php/"); // constante qui définit les dossiers dans lesquels se situe le site pour pouvoir déterminer des chemin absolus à partir de localhost (on ne prend pas locahost). Ainsi nous écrivons tous les chemins (exp : src, href) en absolus avec cette constante.
 
 
 ///////////////////////////// Fonction de débugage //////////////////////////
@@ -21,7 +21,7 @@ define("RACINE_SITE", "/PHP/Course/PHP-2/cinema_php/"); // constante qui défini
 
 ////////////////////// Fonction d'alert ////////////////////////////////////////
 
-function alert(string $contenu, string $class) {
+function alert(string $contenu, string $class)  {
 
     return "<div class='alert alert-$class alert-dismissible fade show text-center w-50 m-auto mb-5' role='alert'>
         $contenu
@@ -32,6 +32,25 @@ function alert(string $contenu, string $class) {
 
 
 }
+
+
+///////////////////////////// Fonction de déconnexion/////////////////////////
+
+function logOut(){
+
+    if(isset($_GET['action']) && !empty($_GET['action']) && $_GET['action'] == 'deconnexion' ){
+
+
+        unset($_SESSION['user']);
+         // On supprime l'indice "user " de la session pour se déconnecter // cette fonction détruit les variables  stocké  comme 'firstName' et 'email'.
+
+        //session_destroy(); // Détruit toutes les données de la session déjà  établie . cette fonction détruit la session sur le serveur 
+
+        header("location:".RACINE_SITE."index.php");
+    }
+
+}
+// logOut();
 
 
 ///////////////////////////  Fonction de connexion à la BDD //////////////////////////
@@ -60,7 +79,7 @@ function alert(string $contenu, string $class) {
 
         // Sans la variable $dsn et sans le constantes, on se connecte à la BDD :
 
-            $pdo = new PDO('mysql:host=localhost;dbname=cinema;charset=utf8', 'root', '');
+            // $pdo = new PDO('mysql:host=localhost;dbname=cinema;charset=utf8', 'root', '');
 
         // avec la variable DSN (Data Source Name) et les constantes
 
@@ -87,7 +106,7 @@ function alert(string $contenu, string $class) {
 
             
     }
-    connexionBdd();
+    // connexionBdd();
 
 
     ///////////////// Une fonction pour créer la table users ////////////////////
@@ -182,40 +201,27 @@ function alert(string $contenu, string $class) {
 
     }
 
+    /////////// Fonction pour vérifier un utilisateur ////////////////////
 
-    
-//////////////////Fonction pour vérifier un utilisateur////////////////////
-    
-function checkUser(string $email, string $pseudo) :mixed {
-        
-    $pdo = connexionBdd();
-    $sql = 'SELECT * FROM users WHERE pseudo = :pseudo AND email = :email';
-    $request = $pdo->prepare($sql);
-    $request->execute( array( 
-    ':pseudo' => $pseudo,
-    ':email'=> $email,
-    ) );
-    $resultat = $request->fetch();
-    return $resultat;
-  }
+    function checkUser(string $email, string $pseudo) :mixed {
+
+        $pdo = connexionBdd();
+
+        $sql = "SELECT * FROM users WHERE pseudo = :pseudo AND email = :email";
+        $request = $pdo->prepare($sql);
+        $request->execute( array(
+            ':pseudo' => $pseudo,
+            ':email' => $email
 
 
-  ///////////////////////   Log out function  ////////////////////////////
-
-
-  function logOut(){
-
-    if(isset($_GET['action']) && !empty($_GET['action']) && $_GET['action'] == 'deconnexion' ){
-
-
-        unset($_SESSION['user']); // On supprime l'indice "user " de la session pour se déconnecter // cette fonction détruit les variables  stocké  comme 'firstName' et 'email'.
-
-        //session_destroy(); // Détruit toutes les données de la session déjà  établie . cette fonction détruit la session sur le serveur 
-
-        header("location:". RACINE_SITE ."index.php");
+        ));
+        $resultat = $request->fetch();
+        return $resultat;
     }
 
-}
+
+
+
 
     ///////////////// Une fonction pour créer la table films ////////////////////
 

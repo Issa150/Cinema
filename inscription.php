@@ -1,15 +1,15 @@
 <?php
-
-
-require_once "inc/functions.inc.php";
+$title = "Inscription";
+require_once "inc/header.inc.php";
+// require_once "inc/functions.inc.php";
 
 // Si l'utilisateur est déjà connecté, il pourras pas avoir accés à la page d'inscription
 if (!empty($_SESSION['user'])) {
 
-    header("location:".RACINE_SITE."profil.php");
+    header('location:'. RACINE_SITE . 'profile.php');
 }
 
-echo "<br><br><br><br><br>";
+echo "<br><br><br><br>";
 
 
 
@@ -25,8 +25,8 @@ $dateLimitInf = $year2."-".$month."-".$date;
 
 $info = '';
 
-if ( !empty($_POST)) // l'envoi du Formulaire (button "S'inscrire" ) 
-{
+// l'envois du formulaire
+if ( !empty($_POST)) {
     // debug($_POST);
 
     $verif = true;
@@ -76,42 +76,32 @@ if ( !empty($_POST)) // l'envoi du Formulaire (button "S'inscrire" )
     if ( strlen($firstName) < 2 || preg_match('/[0-9]+/', $firstName) ) {
 
         $info = alert("Le prénom n'est pas valide.", "danger");
-
     }
 
     if ( strlen($lastName) < 2 || preg_match('/[0-9]+/', $lastName) ) {
 
         $info .= alert("Le nom n'est pas valide.", "danger");
-
     }
 
     if (strlen($pseudo) < 2 ) {
 
         $info .= alert("Le pseudo n'est pas valide.", "danger");
-
     }
 
     if ( strlen($mdp) < 5 || strlen($mdp) > 15 ) {
 
         $info .= alert("Le mot de passe n'est pas valide.", "danger");
-
         }
-    if ( $mdp !== $confirmMdp ) {
-        
-        $info .= alert("Le mot de passe et la confirmation doivent être identique.", "danger");
-
-    }
 
 
     if ( strlen($email) > 50 || !filter_var($email, FILTER_VALIDATE_EMAIL) ) {
 
         $info .= alert("L'email n'est pas valide.", "danger");
-        
     }
 
-    if ( !preg_match('#^[0-9]+$#', $phone) || strlen($phone) > 10 || !trim($phone)) {
+    if ( !preg_match('#^[0-9]+$#', $phone) ) {
 
-        $info .= alert("Le Téléphone n'est pas valide.", "danger");
+        $info .= alert("Le téléphone n'est pas valide.", "danger");
     }
 
     if ( $civility != 'f' && $civility != 'h' ) {
@@ -148,9 +138,6 @@ if ( !empty($_POST)) // l'envoi du Formulaire (button "S'inscrire" )
             if ($emailExist || $pseudoExist) {
 
                     $info = alert("Vous avez déjà un compte", "danger");
-                    // ***************** REDIRECTION "authentification.php"
-                
-
 
             } else if ( $mdp !== $confirmMdp) {
 
@@ -195,9 +182,8 @@ else {
 
 
 
+echo $info;
 
-$title = "Inscription";
-require_once "inc/header.inc.php";
 
 ?>
 
@@ -205,12 +191,6 @@ require_once "inc/header.inc.php";
 
     <div class="w-75 m-auto p-5" style="background: rgba(20, 20, 20, 0.9);">
         <h2 class="text-center p-3 mb-5">Créer un compte</h2>
-
-        <?php
-
-            echo $info;
-            
-        ?>
         
         <form action="" method="post" class="p-5">
 
@@ -302,6 +282,15 @@ require_once "inc/header.inc.php";
 
 
 </main>
+
+
+
+
+
+
+
+
+
 
 
 
