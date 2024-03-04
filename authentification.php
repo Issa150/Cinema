@@ -1,17 +1,9 @@
 <?php
-$title = "Authentification";
-// require_once "inc/header.inc.php";
 
 require_once "inc/functions.inc.php";
 
-// Si l'utilisateur est déjà connecté, il pourras pas avoir accés à la page d'inscription
-// if (!empty($_SESSION['user'])) {
-//     if ($_SESSION['user']['role'] == 'ROLE_ADMIN') {
-//         header('location: ' . RACINE_SITE . 'admin/dashboard.php?dashboard_php');
-//     } else {
-//         header('location:' . RACINE_SITE . 'profile.php');
-//     }       
-// }
+
+
 
 $info = '';
 
@@ -42,29 +34,47 @@ if (!empty($_POST)) {
         $mdp = isset($_POST['mdp']) ? $_POST['mdp'] : null;
 
         $user = checkUser($email, $pseudo);
+        debug($user);
 
         if ($user) {
 
             if (password_verify($mdp, $user['mdp'])) {
+
                 $_SESSION['user'] = $user;
-                header('location: ' . RACINE_SITE . 'profile.php');
+
+                header("location:" . RACINE_SITE . "profil.php");
             } else {
-                $info = alert("Les identificats sont incorrects", "danger");
+                $info = alert("Les identifiants sont incorrectes", "danger");
             }
-        } else {
-            $info = alert("Les identificats sont incorrects", "danger");
         }
+
+        // } else {
+        //     $info = alert("Les identifiants sont incorrectes", "danger");
+
+
+        // }
+
+
+
+
+
     }
 }
 
+$title = "Authentification";
 require_once "inc/header.inc.php";
-
 ?>
 
 <main style="background:url(assets/img/5818.png) no-repeat; background-size: cover; background-attachment: fixed;" class="pt-5 mt-5">
 
     <div class="w-75 m-auto p-5" style="background: rgba(20, 20, 20, 0.9);">
         <h2 class="text-center p-3 mb-5">Connexion</h2>
+
+        <?php
+
+        echo $info;
+
+        ?>
 
         <form action="" method="post" class="p-5">
             <div class="row mb-3">

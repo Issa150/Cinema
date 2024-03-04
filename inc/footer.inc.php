@@ -1,5 +1,5 @@
-<footer class="container-fluid text-center d-flex flex-column justify-content-center">
-      <p>&copy; Cinema - </p>
+    <footer class="container-fluid text-center d-flex flex-column justify-content-center">
+      <p>&copy; Cinema - <?php echo date("Y")?></p>
     </footer>
 
 
