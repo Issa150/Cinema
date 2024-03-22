@@ -1,4 +1,57 @@
 <?php
+include_once "../inc/functions.inc.php";
+
+if (!isset($_SESSION['user'])) {
+
+    header("location: " . RACINE_SITE . "authentification.php");
+} else {
+    if ($_SESSION['user']['role'] == 'ROLE_USER') {
+        header('Location:' . RACINE_SITE . 'index.php');
+    }
+}
+///////////////////////////////:
+
+
+// if (isset($_GET['action']) && isset($_GET['id_user'])) {
+//     if (!empty($_GET['action']) && $_GET['action'] == 'delete' && !empty($_GET['id_user'])) {
+//         // debug($_GET['action']);
+//         $iduser = htmlentities($_GET['id_user']);
+//         deleteuser($iduser);
+//     }
+//     if (!empty($_GET['action']) && $_GET['action'] == 'update' && !empty($_GET['id_user'])) {
+//         // debug($_GET['action']);
+//         $user = showUser($_GET['id_user']);
+//         if ($user['role'] == 'ROLE_ADMIN') {
+//             updateRole('ROLE_USER', $user['id_user']);
+
+//             if ($user['role'] == 'ROLE_USER') {
+//                 updateRole('ROLE_ADMIN', $user['id_user']);
+//                 //header("location:". RACINE_SITE . "dashboard.php?users_php");
+
+//             }
+//         }
+//     }
+// }
+if(isset($_GET['action']) && isset($_GET['id_user'])){
+    if(!empty($_GET['action']) && $_GET ['action']=='delete' && !empty($_GET['id_user'])){
+        $idUser = htmlentities($_GET['id_user']);
+
+        deleteUser($idUser);
+    }
+}
+
+if(!empty($_GET['action']) && $_GET['action'] == 'update' && !empty($_GET['id_user'])){
+    $user = showUser($_GET['id_user']);
+    if($user['role']=='ROLE_ADMIN'){
+        updateRole('ROLE_USER',$user['id_user']);
+
+    }
+
+    if($user['role']=='ROLE_USER'){
+        updateRole('ROLE_ADMIN',$user['id_user']);
+
+    }
+}       
 
 $title = "Backoffice";
 require_once "../inc/header.inc.php";
@@ -15,7 +68,7 @@ require_once "../inc/header.inc.php";
                         <a href="?dashboard_php" class="nav-link text-light">Backoffice</a>
                     </li>
                     <li>
-                        <a href="" class="nav-link text-light">Films</a>
+                        <a href="?films_php" class="nav-link text-light">Films</a>
                     </li>
                     <li>
                         <a href="?categories_php" class="nav-link text-light">Catégories</a>
@@ -67,7 +120,7 @@ require_once "../inc/header.inc.php";
             if (!empty($_GET)) {
 
 
-                if (isset($_GET['films.php'])) {
+                if (isset($_GET['films_php'])) {
                     require_once "films.php";
                 } else if (isset($_GET['categories_php'])) {
                     require_once "categories.php";

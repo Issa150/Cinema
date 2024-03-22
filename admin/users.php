@@ -2,6 +2,42 @@
 $title = "user";
 // include_once "../inc/header.inc.php";
 include_once "../inc/functions.inc.php";
+
+if(!isset($_SESSION['user'])){
+    
+    header("location: ".RACINE_SITE."authentification.php");
+
+}else{
+    if($_SESSION['user']['role'] == 'ROLE_USER'){
+        header('Location:' . RACINE_SITE.'index.php');
+        exit();
+    }
+}
+
+// ///////////////////////////////////:
+
+
+// if (isset($_GET['action']) && $_GET['action'] == 'delete') {
+//     $pdo = connexionBdd();
+//     $id_category = $_GET['id_user'];
+//     // Delete the user with the specified id_category
+//     $sql = "DELETE FROM users WHERE id_user = :id";
+//     $stmt = $pdo->prepare($sql);
+//     // $stmt->bind_param("i", $id_category);
+//     $stmt->execute(array(
+//         ":id" => $id_category
+//     ));
+//     // Redirect the user back to the user list
+//     // header("Location: users_php");
+//     // exit();
+// }
+
+///////////////////////////////////// Fonction pour modifier le rôle//////////////////////////////
+
+
+
+
+
 ?>
 
 
@@ -50,8 +86,14 @@ include_once "../inc/functions.inc.php";
             <td><?= $user['city'] ?></td>
             <td><?= $user['country'] ?></td>
             <td><?= $user['role'] ?></td>
-            <td><?php ?></td>
-            <td><?php ?></td>
+
+            <td><?php ?><a href="?users_php&action=delete&id_user=<?=$user['id_user']?>$user">
+                <i class="bi bi-trash3-fill text-danger"></i>
+            </a></td>
+
+            <td><?php ?><a class="btn btn-danger fs-4" href="?users_php&action=update&id_user=<?=$user['id_user']?>">
+            <?= $user['role'] ?></a>
+            </td>
         </tr>
 
         <?php } ?>

@@ -3,6 +3,16 @@
 $title = "categories";
 include_once "../inc/functions.inc.php";
 
+if(!isset($_SESSION['user'])){
+    
+    header("location: ".RACINE_SITE."authentification.php");
+
+}else{
+    if($_SESSION['user']['role'] == 'ROLE_USER'){
+        header('Location:' . RACINE_SITE.'index.php');
+    }
+}
+
 
 $info = "";
 if(!empty($_POST)){
@@ -42,7 +52,39 @@ if(!empty($_POST)){
 
     }
 }
+//////////////////////////////////////////////////
 
+if(isset($_GET['action']) && $_GET['action'] == 'update'){
+    $id_category = $_GET['id_category'];
+
+    $pdo = connexionBdd();
+    $sql = "SELECT * FROM categories WHERE id_category = $id_category";
+    // $sql = "SELECT * FROM films WHERE id_category = :id";
+    // $request = $pdo->query($sql);
+    // $request->execute(array(
+    //     ':id' => $id_category
+    // ));
+    $request = $pdo->query($sql);
+    $category = $request->fetch();
+    
+}
+///////////////////////////////:::://////////////////
+//*****   Delete   *************************
+if (isset($_GET['action']) && $_GET['action'] == 'delete') {
+    $pdo = connexionBdd();
+    $id_category = $_GET['id_category'];
+    // Delete the user with the specified id_category
+    $sql = "DELETE FROM categories WHERE id_category = :id";
+
+    // $sql = "UPDATE films SET category_id = unknown WHERE category_id = :id;DELETE FROM categories WHERE id_category = :id";
+
+    $stmt = $pdo->prepare($sql);
+    // $stmt->bind_param("i", $id_category);
+    $stmt->execute(array(
+        ":id" => $id_category
+    ));
+
+}
 
 ?>
 
@@ -50,7 +92,7 @@ if(!empty($_POST)){
 
 
     <div class="col-sm-12 col-md-6">
-        <h2 class="text-center fw-bolder mb-5 text-danger">Ajout de categories</h2>
+        <h2 class="text-center fw-bolder mb-5 text-danger"><?= isset($category) ? "Modifiez une category" : "Ajoutez une category"?></h2>
         <?= $info?>
 
         <form action="" method="post">
@@ -59,15 +101,15 @@ if(!empty($_POST)){
 
                 <div class="col-md-8 mb-5">
                     <label for="name">Nom de la categorie</label>
-                    <input type="text" id="name" name="name" class="form-control" placeholder="...">
+                    <input type="text" id="name" name="name" class="form-control fs-4" placeholder="..." value="<?= isset($category) ? $category['name'] : ""?>">
 
                 </div>
                 <div class="col-md-12 mb-5">
                     <label for="description">Description</label>
-                    <textarea name="description" id="description" class="form-control"  rows="10"></textarea>
+                    <textarea name="description" id="description" class="form-control fs-4"  rows="10"><?= isset($category) ? $category['description'] : ""?></textarea>
                 </div>
                 <div class="row justify-content-center">
-                    <button id="addCategorie" type="submit" class="btn btn-danger w-25 m-auto p-3 fw-bolder fs-3">Ajoutez</button>
+                    <button id="addCategorie" type="submit" class="btn btn-danger w-25 m-auto p-3 fw-bolder fs-4"><?= isset($category) ? "Modifiez" : "Ajoutez"?></button>
                 </div>
             </div>
         </form>
@@ -101,8 +143,13 @@ if(!empty($_POST)){
             <td><?= $category['id_category'] ?></td>
             <td><?= $category['name'] ?></td>
             <td><?= substr($category['description'],0,30) ?>...</td>
-            <td><?php ?></td>
-            <td><?php ?></td>
+            <td><?php ?><a href="?categories_php&action=delete&id_category=<?=$category['id_category']?>">
+                <i class="bi bi-trash3-fill text-danger"></i>
+            </a></td>
+
+            <td><?php ?><a href="?categories_php&action=update&id_category=<?=$category['id_category']?>">
+                <i class="bi bi-pen-fill text-info"></i></a>
+            </td>
         </tr>
 
         <?php } ?>

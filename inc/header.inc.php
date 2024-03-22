@@ -4,6 +4,9 @@ require_once "functions.inc.php";
 
 // déconnexion ($_SESSION)
 logOut();
+
+
+$categories = allCategories();
 ?>
 
 
@@ -59,19 +62,30 @@ logOut();
 
 
                                    <ul class="dropdown-menu dropdown-menu-light w-100">
+                                        <?php
+                                        foreach ($categories as $category){
+                                        ?>
 
+                                             <li class='d-flex'>
+                                                  <a class='dropdown-item text-dark fs-4' href='<?= RACINE_SITE?>?id_category=<?=$category['id_category']?>'>
+                                                       <?= $category['name'] ?>
+                                                  </a>
+                                             </li>
+                                        <?php
+                                        }
+                                        ?>
 
-                                        <li>
+                                        <li class="d-flex">
                                              <a class="dropdown-item text-dark fs-4" href="#">
                                                   Catégorie one
                                              </a>
                                         </li>
-                                        <li>
+                                        <li class="d-flex">
                                              <a class="dropdown-item text-dark fs-4" href="#">
                                                   Catégorie two
                                              </a>
                                         </li>
-                                        <li>
+                                        <li class="d-flex">
                                              <a class="dropdown-item text-dark fs-4" href="#">
                                                   Catégorie three
                                              </a>

@@ -22,7 +22,7 @@ require_once "inc/header.inc.php";
 ?>
 
 <main>
-    <h2 class="text-center">Bonjour <?=$_SESSION['user']['firstName']?></h2>
+    <h2 class="text-center">Bonjour <?=$_SESSION['user']['firstName'] ? $_SESSION['user']['firstName'] : "Degage-toi"?></h2>
 
 </main>
 
