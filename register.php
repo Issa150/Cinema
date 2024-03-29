@@ -72,7 +72,8 @@ if ( !empty($_POST)) // l'envoi du Formulaire (button "S'inscrire" )
 
 
 
-
+        // preg_match('/^[0-9]+/', $_POST['title'])   ==> only verfy if starts with number
+        // preg_match('/[0-9]+/', $firstName)   ==>   generally if contains number!
     if ( strlen($firstName) < 2 || preg_match('/[0-9]+/', $firstName) ) {
 
         $info = alert("Le prénom n'est pas valide.", "danger");

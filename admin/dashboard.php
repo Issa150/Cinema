@@ -122,10 +122,13 @@ require_once "../inc/header.inc.php";
 
                 if (isset($_GET['films_php'])) {
                     require_once "films.php";
+
                 } else if (isset($_GET['categories_php'])) {
                     require_once "categories.php";
+
                 } else if (isset($_GET['users_php'])) {
                     require_once "users.php";
+                    
                 } else {
                     require_once "dashboard.php";
                 }

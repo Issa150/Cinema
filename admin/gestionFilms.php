@@ -67,6 +67,7 @@ if (!empty($_POST)) {
     }
 
 
+
     if (!$verif) {
         $info = alert("tout les chemps sont requis", "danger");
     } else {
@@ -75,6 +76,7 @@ if (!empty($_POST)) {
         // }
 
         validateFormFilm($info);
+        
 
         ////////////////
         if (empty($info)) {
@@ -94,12 +96,26 @@ if (!empty($_POST)) {
 
             // $resultat = addFilm( $category_id, $title, $director,  $actors,  $ageLimit,  $duration,  $synopsis,  $dateSortie, $image,  $price, $stock);
             if($_GET['action'] == "update"){
-                updateFilm($id_film, $category_id, $title, $director, $actors, $ageLimit, $duration, $synopsis, $dateSortie, $image, $price, $stock);
+                updateFilm($id_film, $category_id, $title, $director, $actors, $ageLimit, $duration, $synopsis, $dateSortie,       $price, $stock);
                 // move_uploaded_file($_FILES['image']['tmp_name'], '../assets/img/' . $image);
+
+                if($_FILES['image']['size'] > 0){
+                    $pdo = connexionBdd();
+                    // $sql = "INSERT INTO films(image) VALUE(:image) WHERE id_film = :id_film";
+                    $sql = "UPDATE films SET image = :image WHERE id_film = :id_film";
+                    $request = $pdo->prepare($sql);
+                    $request->execute(array(
+                        ":id_film" => $id_film,
+                        ":image" => $image
+                    ));
+
+                    move_uploaded_file($_FILES['image']['tmp_name'], '../assets/img/' . $image);
+                }
+
             }else{
-                addFilm($category_id, $title, $director,  $actors,  $ageLimit,  $duration,  $synopsis,  $dateSortie, $image,  $price, $stock);
+                addFilm($category_id, $title, $director,  $actors,  $ageLimit,  $duration,  $synopsis,  $dateSortie, $image, $price, $stock);
+                move_uploaded_file($_FILES['image']['tmp_name'], '../assets/img/' . $image);
             }
-            move_uploaded_file($_FILES['image']['tmp_name'], '../assets/img/' . $image);
             header('Location: films.php');
             // debug($title, $director, $actors, $category_id, $duration, $synopsis, $dateSortie, $price, $stock, $dateSortie, $ageLimit, $image);
             // la superglobal $_FILES a un indice "image" qui correspond au "name" de l'input type="file" du formulaire, ainsi qu'un indice "name" qui contient le nom du fichier en cours de téléchargement.
@@ -131,7 +147,8 @@ echo $info;
             </div>
 
             <div class="col-md-6 mb-5">
-                <label for="image">Photo</label>
+                <label for="image">Photo </label>
+                <?= isset($film['image']) ?"<strong>Image inciente: </strong>" .$film['image'] : ""?>
                 <input type="file" name="image" id="image" class="form-control fs-4">
             </div>
         </div>

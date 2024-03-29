@@ -333,11 +333,11 @@ function createTableFilms()
 
 // createTableFilms();
 //////////////////////////// Ajouter un film ///////////
-function addFilm(int $category_id,string $title,string $directors, string $actors, int $ageLimit,  $duration, string $synopsis,  $date,string $image, $price, $stock): void{
+function addFilm(int $category_id,string $title,string $directors, string $actors, int $ageLimit,  $duration, string $synopsis, $date, $image, $price, $stock): void{
     $pdo = connexionBdd();
     $sql = "INSERT INTO films 
     (category_id,title,directors, actors, ageLimit, duration, synopsis, date, image,price,stock) 
-    VALUE (:category_id,:title,:directors, :actors, :ageLimit, :duration, :synopsis, :date, :image,:price,:stock)";
+    VALUE (:category_id,:title,:directors, :actors, :ageLimit, :duration, :synopsis, :date,  :image, :price,:stock)";
 
     $request = $pdo->prepare($sql);
     $request->execute(array(
@@ -354,8 +354,55 @@ function addFilm(int $category_id,string $title,string $directors, string $actor
         ":stock"=> $stock
     ));
 }
+// ///////////////////////////::
 
+function showFilm($id_film){
+    $pdo = connexionBdd();
+    // $sql = "SELECT * FROM films WHERE id_film = $id_film";
+    $sql = "SELECT films.*, categories.name AS genre
+    FROM films
+    LEFT JOIN categories
+    ON films.category_id = categories.id_category
+    WHERE id_film = $id_film";
+    $request = $pdo->query($sql);
+    $film = $request->fetch();
+    return $film;
+}
 
+///////////////////////////
+function updateFilm($id_film,$category_id,$title,$directors,$actors,$ageLimit,$duration,$synopsis,$date    ,$price,$stock){
+    $pdo = connexionBdd();
+    $sql = "UPDATE films 
+    SET category_id = :category_id,
+    title = :title,
+    directors = :directors,
+    actors = :actors,
+    ageLimit = :ageLimit,
+    duration = :duration,
+    synopsis = :synopsis,
+    date = :date,
+    
+    price = :price,
+    stock = :stock
+    WHERE id_film = :id_film";
+    // image = :image,
+
+    $request = $pdo->prepare($sql);
+    $request->execute(array(
+        ":id_film" => $id_film,
+        ":category_id" => $category_id,
+        ":title" => $title,
+        ":directors" => $directors,
+        ":actors" => $actors,
+        ":ageLimit" => $ageLimit,
+        ":duration" => $duration,
+        ":synopsis" => $synopsis,
+        ":date" => $date,
+        // ":image" => $image,
+        ":price" => $price,
+        ":stock" => $stock
+    ));
+}
 
 
 
@@ -466,23 +513,7 @@ function  allFilms(): array
 }
 
 //////////////////////////:
-///  delete one item ////
-// function deleteItem($table, $column, $id) {
 
-//     // try {
-//         $pdo = connexionBdd();
-//         $sql = "DELETE FROM $table WHERE $column = :id";
-//         $stmt = $pdo->prepare($sql);
-//         $stmt->execute(array(
-//             ":id" => $id
-//         ));
-
-//         return true;
-//     // } catch (PDOException $e) {
-//     //     // Handle exceptions here
-//     //     return false;
-//     // }
-// }
 
 
 /////////////// les films recents
@@ -506,7 +537,7 @@ function validateFormFilm($info){
         $info .= alert("choizissez une image", "danger");
     }
 
-    if (!isset($_POST['title']) || (strlen($_POST['title']) < 3 && trim($_POST['title'])) || preg_match('/[0-9]+/', $_POST['title'])) {
+    if (!isset($_POST['title']) || (strlen($_POST['title']) < 3 && trim($_POST['title']))) {
 
 
         $info .= alert("Le champ titre n'est pas valide", "danger");
@@ -565,39 +596,7 @@ function validateFormFilm($info){
     return $array;
 }
 
-///////////////////////////
-function updateFilm($id_film,$category_id,$title,$directors,$actors,$ageLimit,$duration,$synopsis,$date,$image,$price,$stock){
-    $pdo = connexionBdd();
-    $sql = "UPDATE films 
-    SET category_id = :category_id,
-    title = :title,
-    directors = :directors,
-    actors = :actors,
-    ageLimit = :ageLimit,
-    duration = :duration,
-    synopsis = :synopsis,
-    date = :date,
-    image = :image,
-    price = :price,
-    stock = :stock
-    WHERE id_film = :id_film";
 
-    $request = $pdo->prepare($sql);
-    $request->execute(array(
-        ":id_film" => $id_film,
-        ":category_id" => $category_id,
-        ":title" => $title,
-        ":directors" => $directors,
-        ":actors" => $actors,
-        ":ageLimit" => $ageLimit,
-        ":duration" => $duration,
-        ":synopsis" => $synopsis,
-        ":date" => $date,
-        ":image" => $image,
-        ":price" => $price,
-        ":stock" => $stock
-    ));
-}
 
 ////////////////////// Une fonction pour la création des clés étrangères //////////////////////////
 
@@ -620,6 +619,20 @@ function foreignKey(string $tableF, string $foreign, string $tableP, string $pri
 // foreignKey('films', 'category_id', 'categories', 'id_category');
 
 
+
+////////////////////////////////////////////////// PANIER /////////////////////////////////
+
+// calculerMontantTotal() pour calculer le montant total du panier en additionnant les prix de chaque film.
+function calculerMontantTotal(array $tab): int
+{
+    $montant_total = 0;
+
+    foreach ($tab as $key) {
+        $montant_total += $key['price'] * $key['quantity'];
+    }
+
+    return $montant_total;
+}
 
 
 ?>
